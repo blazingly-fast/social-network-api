@@ -23,7 +23,7 @@ type SignedDetails struct {
 }
 
 func GenerateAllTokens(email string, firstName string, lastName string, userType string, uid string) (token string, refreshToken string, err error) {
-	claims := &SignedDetails{
+	claims := SignedDetails{
 		Email:      email,
 		First_name: firstName,
 		Last_name:  lastName,
@@ -34,13 +34,13 @@ func GenerateAllTokens(email string, firstName string, lastName string, userType
 		},
 	}
 
-	refreshClaims := &SignedDetails{
+	refreshClaims := SignedDetails{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
 		},
 	}
-	token, err = jwt.NewWithClaims(jwt.SigningMethodES256, claims).SignedString([]byte(SECRET_KEY))
-	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodES256, refreshClaims).SignedString([]byte(SECRET_KEY))
+	token, err = jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))
+	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(SECRET_KEY))
 
 	if err != nil {
 		log.Panic(err)
