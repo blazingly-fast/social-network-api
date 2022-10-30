@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/blazingly-fast/social-network-api/database"
+	"github.com/blazingly-fast/social-network-api/models"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -49,4 +50,13 @@ func GenerateAllTokens(email string, firstName string, lastName string, userType
 
 	return token, refreshToken, err
 
+}
+
+func UpdateAllTokens(token string, refreshToken string, userId string) {
+	var user models.User
+	db.Where("user_id = ?", userId).First(&user)
+	log.Print(&user)
+	user.Token = token
+	user.Refresh_token = refreshToken
+	db.Save(&user)
 }
