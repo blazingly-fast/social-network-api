@@ -2,16 +2,30 @@ package helpers
 
 import (
 	"errors"
+	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPassword(ctx *gin.Context, password string) error {
-	return nil
+func HashPassword(password string) string {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		log.Panic(err)
+	}
+	return string(bytes)
 }
 
-func CheckPassword(ctx *gin.Context) error {
-	return nil
+func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
+	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
+	check := true
+	msg := ""
+	if err != nil {
+		msg = fmt.Sprintf("email or password is incorrect")
+		check = false
+	}
+	return check, msg
 }
 
 func CheckUserType(ctx *gin.Context, role string) (err error) {

@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -14,30 +12,10 @@ import (
 	"github.com/blazingly-fast/social-network-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var db = database.Init(os.Getenv("DATABASE_URL"))
 var validate = validator.New()
-
-func HashPassword(password string) string {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	if err != nil {
-		log.Panic(err)
-	}
-	return string(bytes)
-}
-
-func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
-	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
-	check := true
-	msg := ""
-	if err != nil {
-		msg = fmt.Sprintf("email or password is incorrect")
-		check = false
-	}
-	return check, msg
-}
 
 func Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -57,7 +35,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		passwordIsValid, msg := VerifyPassword(user.Password, foundUser.Password)
+		passwordIsValid, msg := helpers.VerifyPassword(user.Password, foundUser.Password)
 		defer cancel()
 		if passwordIsValid != true {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": msg})
@@ -86,7 +64,7 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
-		password := HashPassword(user.Password)
+		password := helpers.HashPassword(user.Password)
 		user.Password = password
 
 		var count int64
@@ -107,7 +85,23 @@ func Signup() gin.HandlerFunc {
 
 func GetUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// if err := helpers.CheckUserType(ctx, "ADMIN"); err != nil {
+		// 	ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		// 	return
+		// }
+		// var c, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
+		// recordPerPage, err := strconv.Atoi(ctx.Query("recordPerPage"))
+		// if err != nil || recordPerPage < 1 {
+		// 	recordPerPage = 10
+		// }
+		// page, err1 := strconv.Atoi(ctx.Query("page"))
+		// if err1 != nil || page < 1 {
+		// 	page = 1
+		// }
+
+		// startIndex := (page - 1) * recordPerPage
+		// startIndex, err = strconv.Atoi(ctx.Query("startIndex"))
 	}
 }
 
