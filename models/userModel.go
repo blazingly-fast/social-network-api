@@ -15,4 +15,5 @@ type User struct {
 	User_type     string `json:"user_type" validate:"required"`
 	Refresh_token string `json:"refresh_token"`
 	User_id       string `json:"user_id"`
+	Account       *Account
 }
